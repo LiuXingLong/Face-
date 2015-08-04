@@ -1,0 +1,39 @@
+function get_face_id($image,$key,&secret){
+	$url="http://apicn.faceplusplus.com/v2/detection/detect?api_key={$key}&api_secret={$secret}&url={$image}";	
+	$curl = curl_init();   //初始化
+	curl_setopt($curl, CURLOPT_URL, $url); //设置抓取的url	
+	curl_setopt($curl, CURLOPT_HEADER, 0);//设置头文件的信息   不  作为数据流输出
+	curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);//设置获取的信息以文件流的形式返回，而不是直接输出。
+	$data = curl_exec($curl); //执行命令		
+	//$data=json_decode($data);	// 将json 数据转换为对像数据
+	//echo $data->face[0]->face_id; //显示获得的数据	
+	$data=json_decode($data,true);// 将json 数据转换为数组数据
+	//echo $data['face'][0]['face_id']; //显示获得的数据		
+	//关闭URL请求
+	curl_close($curl);	
+	return $data['face'][0]['face_id'];
+}
+function get_similarity($face_id1,$face_id2,$key,&secret){
+	$url="http://apicn.faceplusplus.com/v2/recognition/compare?api_secret={$secret}&api_key={$key}&face_id2={$face_id2}&face_id1={$face_id1}";
+	$curl = curl_init(); //初始化
+	curl_setopt($curl, CURLOPT_URL, $url);   //设置抓取的url
+	curl_setopt($curl, CURLOPT_HEADER, 0);   //设置头文件的信息   不  作为数据流输出
+	curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);  //设置获取的信息以文件流的形式返回，而不是直接输出。
+	$data = curl_exec($curl); //执行命令
+	curl_close($curl);  //关闭URL请求
+	
+	$data=json_decode($data,true);// 将json 数据转换为数组数据
+	//var_dump($data); //显示获得的数据
+	return $data['similarity'];
+}
+$image1="http://mmbiz.qpic.cn/mmbiz/TUKuBSCPI9dtswkuJhqnOtvKA8SGd471B27STw8h73ogjnYQjGfpdzWaaROmLfYKQ2QC507B4eltT58zFPLAdQ/0";
+$image2="http://mmbiz.qpic.cn/mmbiz/TUKuBSCPI9ddQsBTZX7icne8DL1cMEB2EAvvWV1FqiaJqy32BwhEqHs0Y4IuYia1PsiaqNV4F6MmBPdDpKkshzqH9Q/0";
+
+$key=""; //face++  注册后提供的  api_key
+&secret="";//face++  注册后提供的  api_secret
+
+/****** 获取 face_id 值 *****/
+$face_id1=get_face_id($image1,$key,&secret);
+$face_id2=get_face_id($image2,$key,&secret);
+
+echo get_similarity($face_id1,$face_id2,$key,&secret); // 输出相识度
